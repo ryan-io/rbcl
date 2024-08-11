@@ -1,0 +1,6 @@
+@RioClassLibrary.API.REST_HostAddress = http://localhost:5100
+
+GET {{RioClassLibrary.API.REST_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
