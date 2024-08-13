@@ -1,0 +1,9 @@
+Sample JSON -> 
+/// ID (Id) -> STRING (Name) -> STRING (Payload) -> class
+/// "{"Id":1,"Name":"Test","Payload":"12, 323, 232"}"
+
+For parsing JSON ->
+/// "{'Id':1,'Name':'Test','Payload':'12, 323, 232'}"
+
+Checking if index is in bounds ->
+/// (uint)index >= (uint)_length

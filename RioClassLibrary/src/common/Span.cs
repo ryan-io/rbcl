@@ -5,6 +5,7 @@ namespace rbcl;
 
 /// <summary>
 /// A 'naive' implementation of Span based on Stephen Toub's dotnet deep dive video on Span
+/// This span implementation is purely for demo purposes and for learning
 /// This is a readonly ref struct (can only be allocated on the stack) and cannot escape
 ///		to managed heap
 /// Models contiguous data with mutable creation, immutable instance at a later point in time

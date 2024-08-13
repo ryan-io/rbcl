@@ -1,8 +1,9 @@
 ﻿namespace rbcl;
 
 /// <summary>
-/// Thread safe integer that is only allocated on the stack
+/// Thread safe data structure wrapping an integer that is only allocated on the stack
 /// Care for scope must be enacted
+/// This is a much more verbose alternative to Interlocked
 /// </summary>
 public ref struct IntSafe {
 	/// <summary>
@@ -10,11 +11,7 @@ public ref struct IntSafe {
 	/// </summary>
 	public int Value {
 		get => _value;
-		private set {
-			lock (_mutex) {
-				_value = value;
-			}
-		}
+		private set => Interlocked.Exchange(ref _value, value);
 	}
 
 	/// <summary>
@@ -43,6 +40,19 @@ public ref struct IntSafe {
 	}
 
 	/// <summary>
+	/// Implicit operator to case from IntSafe to int
+	/// </summary>
+	/// <returns>IntSafe as int</returns>
+	public static implicit operator int (IntSafe intSafe) => intSafe._value;
+
+
+	/// <summary>
+	/// Implicit operator to case from IntSafe to int
+	/// </summary>
+	/// <returns>int to new IntSafe object (allocation)</returns>
+	public static implicit operator IntSafe (int integer) => new(integer);
+
+	/// <summary>
 	///  Implicit conversion from IntSafe to string.
 	/// </summary>
 	/// <returns>string object</returns>
@@ -53,13 +63,7 @@ public ref struct IntSafe {
 	/// </summary>
 	/// <param name="start"></param>
 	public IntSafe (int start = 0) {
-		_mutex = new();
 		_value = 0;
 		Value = start;
 	}
-
-	/// <summary>
-	///  Protects Value from being changed by multiple threads.
-	/// </summary>
-	readonly object _mutex;
 }
