@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.ExceptionServices;
 
 namespace rbcl;
 
@@ -6,8 +7,41 @@ namespace rbcl;
 /// A simple version of 'Task' that layers on top of 'NaiveThreadPool'
 /// Task is really just a data structure in memory for abstracting work performed
 ///		on a thread pool
+/// 46:28
 /// </summary>
 public class NaiveTask {
+	private bool _isComplete;
+	private Exception? _exception;
+	private Action? _continuation;
+	private ExecutionContext? _context;
+	private readonly object _lock = new();
+
+	/// <summary>
+	/// Queues a work item and completes the operation when the delegate has been invoked
+	/// This is quite similar to the base class library of 'Task.Run' except for some
+	/// perf optimizations
+	/// </summary>
+	/// <param name="work"></param>
+	/// <returns></returns>
+	public static NaiveTask Run (Action work) {
+		NaiveTask task = new();
+
+		// do the operation and complete the task
+		NaiveThreadPool.QueueUserWorkItem(() => {
+			try {
+				work();
+			}
+			catch (Exception e) {
+				task.SetException(e);
+				return;
+			}
+
+			task.SetResult();
+		});
+
+		return task;
+	}
+
 	#region TASKCOMPLETIONSOURCE
 
 	// the following property and two methods within this region are abstract to a System class called
@@ -15,28 +49,105 @@ public class NaiveTask {
 	// For learning and demonstration purposes, I will keep this functionality within the 'NaiveTask' class
 
 	public bool IsCompleted {
-		get { }
+		get {
+			// need some synchronization here; thread safety
+			// the real 'Task' is more robust
+			lock (_lock) {
+				return _isComplete;
+			}
+		}
 	}
 
 	public void SetResult () {
-
+		Complete(default);
 	}
 
 	public void SetException (Exception e) {
-
+		Complete(e);
 	}
 
 	#endregion
 
+	/// <summary>
+	/// Synchronously wait for work to complete
+	/// </summary>
 	public void Wait () {
+		// a thin wrapper around the kernel's blocking primitive
+		ManualResetEventSlim? reset = default;
 
+		lock (_lock) {
+			// if the task is already completed, then there is nothing for us to wait for
+			if (!_isComplete) {
+				reset = new();
+				// 'ManualResetEventSlim.Set' allows one or more threads waiting to proceed
+				ContinueWith(reset.Set);
+			}
+		}
+
+		// this blocks the current thread the 'NaiveTask' is running on until we manually unblock it
+		// 'Wait' will only run if 'ManualResetEventSlim.Set' is invoked beforehand
+		reset?.Wait();
+
+		if (_exception != null) {
+			// Watson bucket contains aggregatable information about where the root exception began
+			// this information is lost when rethrowing the exception
+			//throw _exception;
+
+			// to circumvent this, wrap '_exception' in another 'Exception' or 'AggregateException' (inner exception)
+			//throw new AggregateException("", _exception);
+
+			// we can also use something a bit more low level in order to simply append the previous 
+			// stacktrace to a 'new' exception; augments the original exception
+			// 'ExceptionDispatchInfo.Throw' maintains the original Watson bucket
+			ExceptionDispatchInfo.Throw(_exception);
+		}
 	}
 
 	/// <summary>
 	/// We can invoke this method at any point within the synchronous 'Wait' in order to
 	/// invoke a callback when the task is complete
 	/// </summary>
-	public void ContinueWith (Action action) { }
+	public void ContinueWith (Action action) {
+		lock (_lock) {
+			if (_isComplete) {
+				// if task is already done, run this now by queuing work on 'NaiveThreadPool'
+				NaiveThreadPool.QueueUserWorkItem(action);
+			}
+			else {
+				// otherwise, cache the continuation and continue as is
+				// 'ExecutionContext' is cached for when this task completes so continuation
+				//		can be invoked on completion
+				_continuation = action;
+				_context = ExecutionContext.Capture();
+			}
+		}
+	}
+
+	void Complete (Exception? e) {
+		lock (_lock) {
+			if (_isComplete) {
+				throw new InvalidOperationException("Task is completed.");
+			}
+
+			_isComplete = true;
+			_exception = e;
+
+			if (_continuation != null) {
+				// queue work item that invokes the continuation
+				NaiveThreadPool.QueueUserWorkItem(delegate {
+					if (_context == null) {
+						_continuation();
+					}
+					else {
+						ExecutionContext.Run(
+							_context,
+							state => ((Action)state!).Invoke(),
+							_continuation);
+					}
+				});
+			}
+		}
+	}
 }
 
 /// <summary>
