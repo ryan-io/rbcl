@@ -1,4 +1,4 @@
-﻿namespace RioBenchmarkConsole;
+﻿namespace rbcl.console;
 internal class MqttJsonDemo {
 	public required int Id { get; init; }
 	public required string Name { get; init; }

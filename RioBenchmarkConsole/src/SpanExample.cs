@@ -1,4 +1,4 @@
-﻿namespace RioBenchmarkConsole.src;
+﻿namespace rbcl.console;
 
 internal class SpanExample {
 	public void Run () {
