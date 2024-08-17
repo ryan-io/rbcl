@@ -32,6 +32,7 @@ public enum JsonValidatorErrorType : byte {
 /// }"
 /// </summary>
 public interface IJsonValidator {
+	IReadOnlySet<IJsonValidationStrategy> Strategies { get; }
 	JsonValidationResult Validate (ref string json);
 }
 
@@ -52,15 +53,16 @@ public class JsonValidator : IJsonValidator {
 	/// This constructor accepts a 'HashSet' of validation strategies
 	/// A hash set is used to ensure only one validator type instance is run
 	/// </summary>
-	/// <param name="strategies"></param>
 	public JsonValidator (
 		HashSet<IJsonValidationStrategy> strategies) {
 		ArgumentNullException.ThrowIfNull(strategies);
-
-		foreach (var strategy in strategies) {
-			_strategies.Add(strategy);
-		}
+		_strategies = [.. strategies];
 	}
+
+	/// <summary>
+	/// Returns the list of strategies used to construct the object
+	/// </summary>
+	public IReadOnlySet<IJsonValidationStrategy> Strategies => _strategies;
 
 	/// <summary>
 	/// Takes a string and allocates enough memory on the stack in the form of a 'Span'
@@ -72,6 +74,7 @@ public class JsonValidator : IJsonValidator {
 	/// </summary>
 	/// <param name="json">reference to a string, stackallocs a span for transforming</param>
 	public JsonValidationResult Validate (ref string json) {
+		ArgumentException.ThrowIfNullOrWhiteSpace(json);
 		_errors.Clear();    // reset the errors each invocation of 'Validate'
 
 		// this stack allocated span will be removed from memory when it goes out of scope
@@ -80,12 +83,6 @@ public class JsonValidator : IJsonValidator {
 		// these validators will make changes in memory to this span
 		System.Span<byte> span = stackalloc byte[json.Length];
 		(Encoding.ASCII.GetBytes(json)).CopyTo(span);   // this is how we populate our span
-
-		// the string needs to have some data... return early if there isn't any
-		if (json.Length < 1) {
-			AddError(JsonValidatorErrorType.NullWhitespaceOrEmpty, "An empty string was provided.");
-			return ValidationComplete(ref span);
-		}
 
 		try {
 			foreach (var strategy in _strategies) {
@@ -129,5 +126,5 @@ public class JsonValidator : IJsonValidator {
 	}
 
 	private readonly Dictionary<JsonValidatorErrorType, HashSet<string>> _errors = new();
-	private readonly HashSet<IJsonValidationStrategy> _strategies = new();
+	private readonly HashSet<IJsonValidationStrategy> _strategies;
 }
