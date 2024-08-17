@@ -1,4 +1,6 @@
-﻿namespace rbcl.console;
+﻿using rbcl.naive;
+
+namespace rbcl.console;
 
 /// <summary>
 /// An exercise from Deep DOTNET to understand more of the low level implementation for

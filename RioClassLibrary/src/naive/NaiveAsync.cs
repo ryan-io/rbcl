@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 
-namespace rbcl;
+namespace rbcl.naive;
 
 /// <summary>
 /// A simple version of 'Task' that layers on top of 'NaiveThreadPool'
