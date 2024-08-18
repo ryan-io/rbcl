@@ -14,9 +14,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1D53C8E0-93BA-4FFC-A7F5-74CFAFCE0E47}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation.txt = Documentation.txt
+		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RioClassLibrary.Tests.Unit", "RioClassLibrary.Tests.Unit\RioClassLibrary.Tests.Unit.csproj", "{1DB69C5B-AE1D-4845-A11F-3EC6CE7D5A08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RioClassLibrary.Tests.Unit", "RioClassLibrary.Tests.Unit\RioClassLibrary.Tests.Unit.csproj", "{1DB69C5B-AE1D-4845-A11F-3EC6CE7D5A08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

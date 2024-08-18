@@ -32,19 +32,36 @@ public enum JsonValidatorErrorType : byte {
 /// }"
 /// </summary>
 public interface IJsonValidator {
-	IReadOnlySet<IJsonValidationStrategy> Strategies { get; }
+	IReadOnlySet<IJsonValidationStrategy> ProcessStrategies { get; }
 	JsonValidationResult Validate (ref string json);
 }
 
 public interface IJsonValidationStrategy {
 	// return type 'JsonValidatorErrorType' should return '0' if no errors were encountered,
 	// otherwise, the string should contain a detailed message of the issue 
-	JsonStrategyResult ValidateStrategy (ref System.Span<byte> json);
+	JsonStrategyResult ValidateStrategy (System.Span<byte> json);
 }
 
 public readonly struct JsonStrategyResult {
 	public JsonValidatorErrorType ErrorType { get; init; }
 	public string? ErrorMessage { get; init; }
+
+	public static JsonStrategyResult Good =>
+		new() { ErrorMessage = string.Empty, ErrorType = JsonValidatorErrorType.None };
+}
+
+/// <summary>
+/// Struct wrapper for validating JSON
+/// </summary>
+public readonly struct JsonValidationResult {
+	public bool HadErrors { get; init; }
+	public string Json { get; init; }
+
+	/// <summary>
+	/// A dictionary containing a byte (JsonValidatorErrorType) and a hashset of strings
+	///		that contain errors encountered during validation
+	/// </summary>
+	public Dictionary<JsonValidatorErrorType, HashSet<string>>? Errors { get; init; }
 }
 
 /// <inheritdoc/>>
@@ -52,17 +69,22 @@ public class JsonValidator : IJsonValidator {
 	/// <summary>
 	/// This constructor accepts a 'HashSet' of validation strategies
 	/// A hash set is used to ensure only one validator type instance is run
+	/// A second hash set is pass to act as a collection of strategies that are
+	///		to be run before the primary process strategies
+	/// This hashset is deemed the 'preprocess strategies' set
 	/// </summary>
 	public JsonValidator (
-		HashSet<IJsonValidationStrategy> strategies) {
-		ArgumentNullException.ThrowIfNull(strategies);
-		_strategies = [.. strategies];
+		HashSet<IJsonValidationStrategy> processStrategies,
+			HashSet<IJsonValidationStrategy>? preprocessStrategies = default) {
+		ArgumentNullException.ThrowIfNull(processStrategies);
+		_processStrategies = processStrategies;
+		_preprocessStrategies = preprocessStrategies;
 	}
 
 	/// <summary>
 	/// Returns the list of strategies used to construct the object
 	/// </summary>
-	public IReadOnlySet<IJsonValidationStrategy> Strategies => _strategies;
+	public IReadOnlySet<IJsonValidationStrategy> ProcessStrategies => _processStrategies;
 
 	/// <summary>
 	/// Takes a string and allocates enough memory on the stack in the form of a 'Span'
@@ -85,13 +107,11 @@ public class JsonValidator : IJsonValidator {
 		(Encoding.ASCII.GetBytes(json)).CopyTo(span);   // this is how we populate our span
 
 		try {
-			foreach (var strategy in _strategies) {
-				var error = strategy.ValidateStrategy(ref span);
-
-				if (!error.ErrorType.HasFlag(JsonValidatorErrorType.None)) {
-					AddError(error.ErrorType, error.ErrorMessage);
-				}
+			if (ShouldRunPreprocessors) {
+				ValidateSet(span, _preprocessStrategies!); // see 'ShouldRunPreprocessors'
 			}
+
+			span = ValidateSet(span, _processStrategies);
 		}
 		catch (JsonException e) {
 			// this is a bit of a generic 'catch all' when using 'System.Text.Json'
@@ -99,6 +119,20 @@ public class JsonValidator : IJsonValidator {
 		}
 
 		return ValidationComplete(ref span);
+	}
+
+	private System.Span<byte> ValidateSet (
+		System.Span<byte> span,
+		HashSet<IJsonValidationStrategy> validationStrategies) {
+		foreach (var strategy in validationStrategies) {
+			var error = strategy.ValidateStrategy(span);
+
+			if (!error.ErrorType.HasFlag(JsonValidatorErrorType.None)) {
+				AddError(error.ErrorType, error.ErrorMessage);
+			}
+		}
+
+		return span;
 	}
 
 	private void AddError (JsonValidatorErrorType type, string? errorMsg) {
@@ -125,6 +159,9 @@ public class JsonValidator : IJsonValidator {
 		};
 	}
 
+	private bool ShouldRunPreprocessors => _preprocessStrategies is { Count: > 0 };
+
 	private readonly Dictionary<JsonValidatorErrorType, HashSet<string>> _errors = new();
-	private readonly HashSet<IJsonValidationStrategy> _strategies;
+	private readonly HashSet<IJsonValidationStrategy>? _preprocessStrategies;
+	private readonly HashSet<IJsonValidationStrategy> _processStrategies;
 }

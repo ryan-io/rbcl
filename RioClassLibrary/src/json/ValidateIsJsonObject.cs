@@ -7,7 +7,7 @@ namespace rbcl;
 /// Validates whether the JSON string is in an appropriate format
 /// </summary>
 public class ValidateIsJsonObject : IJsonValidationStrategy {
-	public JsonStrategyResult ValidateStrategy (ref System.Span<byte> json) {
+	public JsonStrategyResult ValidateStrategy (System.Span<byte> json) {
 		JsonValidatorErrorType errorType = JsonValidatorErrorType.None;
 		string errorMessage = string.Empty;
 

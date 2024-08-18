@@ -1,6 +1,7 @@
-﻿namespace rbcl.console {
-	internal class JsonValidatorExample {
-		public void Run () {
+## JSON Validator
+
+``` csharp
+public void Run () {
 			var json = "{'Id':1,'Name': 'Test','Payload':'12, 323, 232'}";
 
 #if DEBUG
@@ -35,6 +36,18 @@
 			Console.WriteLine($"Validation resulted in the following json: {validatedJson}");
 
 #endif
-		}
+
+/// <summary>
+/// To create your own validation strategies, create a new class and implement 'IJsonValidationStrategy'
+/// The method to define implementation for is 'ValidateStrategy(System.Span<byte> json)'
+/// Take note -> this span is mutable; you are directly modifying the byte values for a contiguous
+///		portion of memory allocated on the stack
+/// </summary>
+public class MyJsonValidationExample : IJsonValidationStrategy
+{
+	public JsonStrategyResult ValidateStrategy(System.Span<byte> json)
+	{
+		throw new NotImplementedException();
 	}
 }
+```

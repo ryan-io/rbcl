@@ -1,7 +1,4 @@
-﻿//var ex = new NaiveAsyncExample();
-//ex.RunQueueWorkerThreadNonDeterministic();
-
-using rbcl.console;
+﻿using rbcl.console;
 
 var ex = new JsonValidatorExample();
 ex.Run();
