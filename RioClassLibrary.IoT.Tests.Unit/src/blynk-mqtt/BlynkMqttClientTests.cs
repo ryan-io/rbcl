@@ -21,7 +21,7 @@ namespace rbcl.iot.tests.unit {
 #endif
 		}
 
-		//TODO: connect to a server needs to be mocked correctly
+		//TODO: connect to a server needs to be mocked correctly!
 		//[Fact]
 		//public async Task Connect_ShouldConnectToBroker_WhenCalled () {
 		//	// Arrange
