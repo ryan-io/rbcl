@@ -2,6 +2,11 @@
 
 namespace rbcl.iot;
 
+/// <summary>
+/// Gets the following payload:
+///		Topic: "ds" (downstream)
+///		Payload: "temperature_sys_1" (looks for this identifier
+/// </summary>
 public class GetDatastreamPayloads : IMqttMsg {
 
 	public MqttApplicationMessage Get () {
@@ -14,8 +19,11 @@ public class GetDatastreamPayloads : IMqttMsg {
 	}
 }
 
+/// <summary>
+///		Topic: "ds" (downstream)
+///		Payload: "timestamp" (looks for this identifier)
+/// </summary>
 public class GetTimestampPayload : IMqttMsg {
-
 	public MqttApplicationMessage Get () {
 		var applicationMessage = new MqttApplicationMessageBuilder()
 			.WithTopic("get/ds")
