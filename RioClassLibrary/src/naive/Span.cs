@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace rbcl;
+namespace rbcl.naive;
 
 /// <summary>
 /// A 'naive' implementation of Span based on Stephen Toub's dotnet deep dive video on Span

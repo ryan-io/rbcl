@@ -5,8 +5,8 @@ using System.Text;
 namespace rbcl.tests.unit {
 	public class JsonValidatorUnitTests {
 		private JsonValidator _sut;
-		private HashSet<IJsonValidationStrategy> _processStrategies;
-		private HashSet<IJsonValidationStrategy> _preprocessStrategies;
+		private JsonStrategyMap _processStrategies;
+		private JsonStrategyMap _preprocessStrategies;
 
 		public JsonValidatorUnitTests () {
 			_processStrategies =

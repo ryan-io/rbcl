@@ -61,8 +61,14 @@ public readonly struct JsonValidationResult {
 	/// A dictionary containing a byte (JsonValidatorErrorType) and a hashset of strings
 	///		that contain errors encountered during validation
 	/// </summary>
-	public Dictionary<JsonValidatorErrorType, HashSet<string>>? Errors { get; init; }
+	public JsonValidationErrorMap? Errors { get; init; }
 }
+
+[Serializable]
+public class JsonValidationErrorMap : Dictionary<JsonValidatorErrorType, HashSet<string>> { }
+
+[Serializable]
+public class JsonStrategyMap : HashSet<IJsonValidationStrategy> { }
 
 /// <inheritdoc/>>
 public class JsonValidator : IJsonValidator {
@@ -74,8 +80,8 @@ public class JsonValidator : IJsonValidator {
 	/// This hashset is deemed the 'preprocess strategies' set
 	/// </summary>
 	public JsonValidator (
-		HashSet<IJsonValidationStrategy> processStrategies,
-			HashSet<IJsonValidationStrategy>? preprocessStrategies = default) {
+		JsonStrategyMap processStrategies,
+		JsonStrategyMap? preprocessStrategies = default) {
 		ArgumentNullException.ThrowIfNull(processStrategies);
 		_processStrategies = processStrategies;
 		_preprocessStrategies = preprocessStrategies;
@@ -161,7 +167,7 @@ public class JsonValidator : IJsonValidator {
 
 	private bool ShouldRunPreprocessors => _preprocessStrategies is { Count: > 0 };
 
-	private readonly Dictionary<JsonValidatorErrorType, HashSet<string>> _errors = new();
-	private readonly HashSet<IJsonValidationStrategy>? _preprocessStrategies;
-	private readonly HashSet<IJsonValidationStrategy> _processStrategies;
+	private readonly JsonValidationErrorMap _errors = new();
+	private readonly JsonStrategyMap? _preprocessStrategies;
+	private readonly JsonStrategyMap _processStrategies;
 }

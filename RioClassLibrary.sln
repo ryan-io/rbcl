@@ -19,6 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RioClassLibrary.Tests.Unit", "RioClassLibrary.Tests.Unit\RioClassLibrary.Tests.Unit.csproj", "{1DB69C5B-AE1D-4845-A11F-3EC6CE7D5A08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RioClassLibrary.IoT", "RioClassLibrary.IoT\RioClassLibrary.IoT.csproj", "{F8CC8482-04AF-4912-9968-ECC30AF6B7E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RioClassLibrary.IoT.Tests.Unit", "RioClassLibrary.IoT.Tests.Unit\RioClassLibrary.IoT.Tests.Unit.csproj", "{CF91BAC8-4797-4A82-9C35-B8C97DAF70AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{1DB69C5B-AE1D-4845-A11F-3EC6CE7D5A08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DB69C5B-AE1D-4845-A11F-3EC6CE7D5A08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DB69C5B-AE1D-4845-A11F-3EC6CE7D5A08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8CC8482-04AF-4912-9968-ECC30AF6B7E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8CC8482-04AF-4912-9968-ECC30AF6B7E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8CC8482-04AF-4912-9968-ECC30AF6B7E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8CC8482-04AF-4912-9968-ECC30AF6B7E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF91BAC8-4797-4A82-9C35-B8C97DAF70AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF91BAC8-4797-4A82-9C35-B8C97DAF70AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF91BAC8-4797-4A82-9C35-B8C97DAF70AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF91BAC8-4797-4A82-9C35-B8C97DAF70AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

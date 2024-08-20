@@ -1,11 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>rbcl</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Rio Class Library</Title>
+    <Version>1.0.2</Version>
+    <Company>ryan-io</Company>
+    <Description>A collection of systems used in my .NET projects</Description>
+    <Copyright>ryan-io</Copyright>
+    <PackageProjectUrl>https://github.com/ryan-io/rbcl</PackageProjectUrl>
+    <PackageIcon>rio-logo2.png</PackageIcon>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/ryan-io/rbcl</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Modified JsonValidationResult to accept an appropriate collection for 'Errors'.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,5 +28,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>$(DefineConstants);CONSOLE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\logos\rio-logo2.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

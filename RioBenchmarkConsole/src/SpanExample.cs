@@ -5,8 +5,8 @@ internal class SpanExample {
 		var array = new int[103];
 		array[0] = 100;
 
-		rbcl.Span<int> mySpan = new rbcl.Span<int>(ref array);
-		rbcl.Span<int> mySpan2 = new rbcl.Span<int>(mySpan);
+		naive.Span<int> mySpan = new naive.Span<int>(ref array);
+		naive.Span<int> mySpan2 = new naive.Span<int>(mySpan);
 		Console.WriteLine(mySpan[0]);
 
 		Console.WriteLine(mySpan2[0]);
@@ -17,7 +17,7 @@ internal class SpanExample {
 			int* spans = stackalloc int[1000];
 			spans[0] = 1006;
 			//ref var spanPtr = ref spans;	can explicitly create the reference to this span
-			rbcl.Span<int> mySpan3 = new rbcl.Span<int>(spans, 1000);
+			naive.Span<int> mySpan3 = new naive.Span<int>(spans, 1000);
 			Console.WriteLine(mySpan3[0]);
 		}
 
