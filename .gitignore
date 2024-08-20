@@ -437,13 +437,5 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 other-workflows/
-LabAutomata.WebApi/program.cs
+/.github/bak.workflow/
 notes.md
-[Ll]abaAutomata.[Bb]enchmark/
-[Ll]abAutomata.[Bb]enchmark
-
-# credentials for connecting to Blynk
-[Ll]abAutomata/[Ll]abAutomata.Arduino/[Ll]ibraries/credentials.h
-LabAutomata.Arduino/libraries/credentials.h
-LabAutomata.Arduino/libraries/credentials/credentials.h
-LabAutomata/src/setup/logging/*
