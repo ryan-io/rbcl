@@ -33,9 +33,6 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
 
-      - name: Restore package dependencies
-        run: dotnet restore ${{env.bcl_project}}
-
       - name: Build projects
         run: dotnet build ${{env.bcl_project}} --no-restore
 
