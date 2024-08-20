@@ -8,8 +8,8 @@ on:
 
 env:
   # these must be defined as lower case
-  bcl_project: RioClassLibrary/RioClassLibrary.csproj
   iot_project: RioClassLibrary.IoT/RioClassLibrary.IoT.csproj
+  bcl_project: RioClassLibrary/RioClassLibrary.csproj
   #wpf_library_project: LabAutomata.Wpf.Library/LabAutomata.Wpf.Library.csproj
   #ui_library_project: LabAutomata.Library/LabAutomata.Library.csproj
   #db_project: LabaAutomata.Db/LabAutomata.Db.csproj
