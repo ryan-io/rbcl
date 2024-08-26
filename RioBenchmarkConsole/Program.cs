@@ -1,17 +1,11 @@
 ﻿using rbcl.console;
+using System.Reactive.Linq;
 
-var ex = new JsonValidatorExample();
-ex.Run();
+var ex = new RxExample();
+var obs = ex.GenerateTest(10, 15);
+var observer = obs.Subscribe(x => { Console.WriteLine($"Number {x}"); },
+	onCompleted: () => { Console.WriteLine("Complete!"); });
 
-// for long running operations that will block a thread pool thread in its entirety
-Task.Factory.StartNew(async () => {
-	while (true) {
-		Console.WriteLine($"Running...{Thread.CurrentThread.IsThreadPoolThread}");
-		Console.WriteLine($"State: {Thread.CurrentThread.ThreadState}");
-		await Task.Delay(TimeSpan.FromSeconds(2));
-	}
-
-	return Task.CompletedTask;
-}, TaskCreationOptions.LongRunning);
+observer.Dispose();
 
 Console.ReadLine();
