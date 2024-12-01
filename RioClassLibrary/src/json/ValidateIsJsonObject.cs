@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace rbcl;
+namespace rbcl.json;
 
 /// <summary>
 /// Validates whether the JSON string is in an appropriate format

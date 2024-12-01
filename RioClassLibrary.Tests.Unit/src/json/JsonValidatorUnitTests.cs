@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using NSubstitute;
 using System.Text;
+using rbcl.json;
 
 namespace rbcl.tests.unit {
 	public class JsonValidatorUnitTests {

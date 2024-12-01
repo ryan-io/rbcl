@@ -1,4 +1,4 @@
-﻿namespace rbcl;
+﻿namespace rbcl.json;
 
 /// <summary>
 /// Stack allocates a span from string 'str' and replaces /' with /"

@@ -14,13 +14,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
 
   <ItemGroup>
-    <ProjectReference Include="..\RioClassLibrary.Rx\RioClassLibrary.Rx.csproj" />
-    <ProjectReference Include="..\RioClassLibrary\RioClassLibrary.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Reactive" Version="6.0.1" />
+    <ProjectReference Include="..\RioClassLibrary\RioClassLibrary.csproj" />
   </ItemGroup>
 
 </Project>

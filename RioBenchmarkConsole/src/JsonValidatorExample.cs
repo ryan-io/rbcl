@@ -1,4 +1,6 @@
-﻿namespace rbcl.console;
+﻿using rbcl.json;
+
+namespace rbcl.console;
 
 internal class JsonValidatorExample {
 	public void Run () {

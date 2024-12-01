@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace rbcl;
+namespace rbcl.json;
 
 [Flags, Serializable]
 public enum JsonValidatorErrorType : byte {
@@ -114,10 +114,10 @@ public class JsonValidator : IJsonValidator {
 
 		try {
 			if (ShouldRunPreprocessors) {
-				ValidateSet(span, _preprocessStrategies!); // see 'ShouldRunPreprocessors'
+				ValidateSet(ref span, _preprocessStrategies!); // see 'ShouldRunPreprocessors'
 			}
 
-			span = ValidateSet(span, _processStrategies);
+			span = ValidateSet(ref span, _processStrategies);
 		}
 		catch (JsonException e) {
 			// this is a bit of a generic 'catch all' when using 'System.Text.Json'
@@ -128,7 +128,7 @@ public class JsonValidator : IJsonValidator {
 	}
 
 	private System.Span<byte> ValidateSet (
-		System.Span<byte> span,
+		ref System.Span<byte> span,
 		HashSet<IJsonValidationStrategy> validationStrategies) {
 		foreach (var strategy in validationStrategies) {
 			var error = strategy.ValidateStrategy(span);
