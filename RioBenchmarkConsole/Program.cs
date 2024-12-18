@@ -1,5 +1,4 @@
 ﻿using rbcl.console;
-using System.Reactive.Linq;
 
 var ex = new RxExample();
 var obs = ex.GenerateTest(10, 15);
