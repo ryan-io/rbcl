@@ -53,6 +53,8 @@ namespace rbcl {
 
 		#endregion
 
+		#region COLLECTIONS
+
 		/// <summary>
 		///  https://briancaos.wordpress.com/2022/07/04/c-list-batch-braking-an-ienumerable-into-batches-with-net/
 		///  This method will break an IEnumerable into batches of a given size. Any overflow will be returned as a final batch.
@@ -82,5 +84,7 @@ namespace rbcl {
 			if (batch != null && count > 0)
 				yield return batch.Take(count).ToArray();
 		}
+
+		#endregion
 	}
 }

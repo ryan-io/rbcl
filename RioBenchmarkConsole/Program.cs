@@ -1,10 +1,8 @@
-﻿using rbcl.console;
+﻿using rbcl.network;
 
-var ex = new RxExample();
-var obs = ex.GenerateTest(10, 15);
-var observer = obs.Subscribe(x => { Console.WriteLine($"Number {x}"); },
-	onCompleted: () => { Console.WriteLine("Complete!"); });
+var server = new TcpServer("127.0.0.1");
 
-observer.Dispose();
 
-Console.ReadLine();
+Console.WriteLine("Starting server");
+await server.Start();
+Console.WriteLine("Server has been stopped");
