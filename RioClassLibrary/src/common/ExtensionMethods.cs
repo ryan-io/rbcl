@@ -1,17 +1,21 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace rbcl {
-	public static class ExtensionMethods {
+namespace rbcl
+{
+	public static class ExtensionMethods
+	{
 		#region CONVERSIONS
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int ToInt (this char c) {
+		public static int ToInt (this char c)
+		{
 			// ASCII digits start at 48
 			return c - '0';
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsDigit (this char c) {
+		public static bool IsDigit (this char c)
+		{
 			return c is >= '0' and <= '9'; // 'a'
 		}
 
@@ -40,7 +44,8 @@ namespace rbcl {
 		/// Internal helper method for obfuscating logic on checking byte pointers for 'HasFlags'
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveInlining)]
-		static unsafe bool HasFlags<T> (T* first, T* second) where T : unmanaged, Enum {
+		static unsafe bool HasFlags<T> (T* first, T* second) where T : unmanaged, Enum
+		{
 			var pf = (byte*)first;
 			var ps = (byte*)second;
 
@@ -64,11 +69,13 @@ namespace rbcl {
 		/// <typeparam name="T">Generic type</typeparam>
 		/// <returns>Enumerable of an enumerable with appropriate batch sizes. The final element may not have equal size
 		///  due to it being use as 'overflow'</returns>
-		public static IEnumerable<IEnumerable<T>?> Batch<T> (this IEnumerable<T> enumerator, int size) {
+		public static IEnumerable<IEnumerable<T>?> Batch<T> (this IEnumerable<T> enumerator, int size)
+		{
 			T[]? batch = null;
 			var count = 0;
 
-			foreach (var item in enumerator) {
+			foreach (var item in enumerator)
+			{
 				batch ??= new T[size];
 
 				batch[count++] = item;

@@ -1,38 +1,177 @@
-﻿using rbcl.network;
-using System.Net;
+﻿using Microsoft.Extensions.Logging;
+using rbcl;
+using rbcl.network;
+using riolog;
 
-var server = new TcpServer("127.0.0.1");
-Console.WriteLine("Starting server");
+var logger = new Logger();
+var cts = new CancellationTokenSource();
+using var server = new TcpServer("127.0.0.1", logger: logger);
+server.Start(cts.Token);
 
-var startTask = server.Start();
+var reader = new ConsoleStreamReader();
+reader.InputReceived += TestExit;
+await reader.Start(cts.Token);
+var blocker = new ResponsiveBlock();
+await blocker.Wait(() => cts.IsCancellationRequested);
+logger.CloseAndFlush();
 
-await Task.Delay(2000);
-server.Connect(IPAddress.Parse("127.0.0.1"));
+return 0;
 
-var logicTask = Task.Run(() =>
+void TestExit (string? msg)
 {
-	while (true)
+	if (msg == "exit")
 	{
-		var input = Console.ReadLine();
+		cts.Cancel();
+	}
+}
 
-		if (string.IsNullOrWhiteSpace(input))
-		{
-			continue;
-		}
-
-		if (input == "exit")
-		{
-			break;
-		}
-
-		var t = server?.ClientMap;
-		server?.BroadcastAll(input);
-		Console.WriteLine($"Broadcasting: {input}");
+class Logger : ITcpLogger
+{
+	public void Log (string message)
+	{
+		_log.LogDebug(message);
 	}
 
-	server?.Dispose();
-});
+	public void LogException (Exception exception)
+	{
+		_log.LogError(exception.Message);
+	}
 
-await Task.WhenAll(startTask, logicTask);
+	public void LogTrace (string message)
+	{
+		_log.LogTrace(message);
+	}
 
-Console.WriteLine("Server has been stopped");
+	public void LogWarning (string message)
+	{
+		_log.LogWarning(message);
+	}
+
+	public void CloseAndFlush ()
+	{
+		_log.CloseAndFlush();
+	}
+
+	private readonly ILogger _log = InternalLogFactory.SetupAndStartAsLogger(Output.Console);
+}
+
+//using System.Net.Sockets;
+//using System.Text;
+
+//// this is our client
+
+//var cts = new CancellationTokenSource();
+//var client = new TcpClient("127.0.0.1", 10000);
+
+//var msg = "Connecting to server...";
+//var stream = client.GetStream();
+//var byteStream = Encoding.ASCII.GetBytes(msg);
+
+//// send a message to the server
+//await stream.WriteAsync(byteStream, 0, byteStream.Length, cts.Token);
+
+//// receive a message from the server
+//var buffer = new byte[1024];
+//var received = await stream.ReadAsync(buffer, cts.Token);
+//var message = Encoding.ASCII.GetString(buffer, 0, received);
+//Console.WriteLine($"Received {message}");
+
+//stream.Close();
+//client.Close();
+
+////var cts = new CancellationTokenSource();
+////var inputTask = PollInput(cts.Token);
+////var outputTask = PollOutput(cts.Token);
+
+////await Task.WhenAll(inputTask, outputTask);
+
+//////socket.Shutdown(SocketShutdown.Both);
+////socket.Close();
+
+//return 0;
+
+//async Task PollInput (CancellationToken token)
+//{
+//	while (!token.IsCancellationRequested)
+//	{
+//		var input = Console.ReadLine();
+//		if (string.IsNullOrWhiteSpace(input))
+//		{
+//			continue;
+//		}
+
+//		TcpClient client;
+//		if (input == "exit")
+//		{
+//			cts.Cancel();
+//			break;
+//		}
+
+//		var buffer = Encoding.UTF8.GetBytes(input);
+//		try
+//		{
+//			_ = await socket.SendAsync(buffer, SocketFlags.None, token);
+//		}
+//		catch (SocketException ex)
+//		{
+//			Console.WriteLine($"SocketException: {ex.Message}");
+//			break;
+//		}
+//		catch (Exception ex)
+//		{
+//			Console.WriteLine($"Exception: {ex.Message}");
+//			break;
+//		}
+//	}
+//}
+
+//async Task PollOutput (CancellationToken token)
+//{
+//	while (!token.IsCancellationRequested)
+//	{
+//		var buffer = new byte[1024];
+//		var received = await socket.ReceiveAsync(buffer, SocketFlags.None, token);
+//		var message = Encoding.UTF8.GetString(buffer, 0, received);
+//		Console.WriteLine(message);
+//	}
+//}
+
+
+//using rbcl.network;
+//using System.Net;
+
+//var server = new TcpServer("127.0.0.1");
+//Console.WriteLine("Starting server");
+
+//var startTask = server.Start();
+
+//await Task.Delay(2000);
+//server.Connect(IPAddress.Parse("127.0.0.1"));
+
+//var logicTask = Task.Run(() =>
+//{
+//	while (true)
+//	{
+//		var input = Console.ReadLine();
+
+//		if (string.IsNullOrWhiteSpace(input))
+//		{
+//			continue;
+//		}
+
+//		if (input == "exit")
+//		{
+//			break;
+//		}
+
+//		var t = server?.ClientMap;
+//		server?.BroadcastAll(input);
+//		Console.WriteLine($"Broadcasting: {input}");
+//	}
+
+//	server?.Dispose();
+//});
+
+//await Task.WhenAll(startTask, logicTask);
+
+//Console.WriteLine("Server has been stopped");
