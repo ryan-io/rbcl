@@ -1,54 +1,85 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
+using Microsoft.Extensions.Logging;
 using rbcl;
 using rbcl.network;
 using riolog;
 
-var logger = new Logger();
-var cts = new CancellationTokenSource();
-using var server = new TcpServer("127.0.0.1", logger: logger);
-server.Start(cts.Token);
-
-var reader = new ConsoleStreamReader();
-reader.InputReceived += TestExit;
-await reader.Start(cts.Token);
-var blocker = new ResponsiveBlock();
-await blocker.Wait(() => cts.IsCancellationRequested);
-logger.CloseAndFlush();
+await RunClient();
 
 return 0;
 
-void TestExit (string? msg)
+async Task RunServer()
 {
-	if (msg == "exit")
-	{
-		cts.Cancel();
+	var logger = new Logger();
+	var cts = new CancellationTokenSource();
+	using var server = new TcpServer("127.0.0.1", logger: logger);
+	server.Start(cts.Token);
+
+	var reader = new ConsoleStreamReader();
+	reader.InputReceived += TestExit;
+	var readTask = reader.Start(cts.Token);
+
+	var blocker = new ResponsiveBlock();
+	var blockTask = blocker.Wait(() => cts.IsCancellationRequested);
+
+	await Task.WhenAll(readTask, blockTask);
+
+	logger.CloseAndFlush();
+
+	void TestExit (string? msg) {
+		if (msg == "exit") {
+			cts.Cancel();
+		}
 	}
 }
 
-class Logger : ITcpLogger
-{
-	public void Log (string message)
-	{
+async Task RunClient () {
+	var logger = new Logger();
+	var cts = new CancellationTokenSource();
+
+	using var client = new TcpClientExtendedTest("127.0.0.1", 10000);
+
+	var reader = new ConsoleStreamReader();
+	reader.InputReceived += TestExit;
+	var readTask = reader.Start(cts.Token);
+
+	var blocker = new ResponsiveBlock();
+	var blockTask = blocker.Wait(() => cts.IsCancellationRequested);
+
+	await Task.WhenAll(readTask, blockTask);
+
+	logger.CloseAndFlush();
+
+	void TestExit (string? msg) {
+		if (msg == "exit") {
+			cts.Cancel();
+		}
+		else
+		{
+			client.SendData(Encoding.UTF8.GetBytes(msg));
+		}	
+	}
+}
+
+
+class Logger : ITcpLogger {
+	public void Log (string message) {
 		_log.LogDebug(message);
 	}
 
-	public void LogException (Exception exception)
-	{
+	public void LogException (Exception exception) {
 		_log.LogError(exception.Message);
 	}
 
-	public void LogTrace (string message)
-	{
+	public void LogTrace (string message) {
 		_log.LogTrace(message);
 	}
 
-	public void LogWarning (string message)
-	{
+	public void LogWarning (string message) {
 		_log.LogWarning(message);
 	}
 
-	public void CloseAndFlush ()
-	{
+	public void CloseAndFlush () {
 		_log.CloseAndFlush();
 	}
 
