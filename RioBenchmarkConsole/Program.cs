@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using rbcl;
+using rbcl.naive;
 using rbcl.network;
 using riolog;
 
-await RunClient();
-
+var array = NaiveArrayPool<byte>.Rent(89);
+Console.WriteLine(array.Length);
 return 0;
 
 async Task RunServer()

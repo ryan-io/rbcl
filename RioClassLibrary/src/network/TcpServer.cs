@@ -74,30 +74,15 @@ namespace rbcl.network
 			try
 			{
 				// start the server in a new thread
+				//var t = new Thread(Accept);
+				//t.Start();
 				Task.Run(Accept, _cts.Token);
-				Task.Run(TestOut, _cts.Token);
 			}
 			catch (TaskCanceledException e) { _logger?.LogException(e); }
 			catch (SocketException e) { _logger?.LogException(e); }
 
 			_logger?.Log(Message.ServerStarted);
 			Started = true;
-		}
-
-		private void TestOut ()
-		{
-			var client = new TcpClientExtended(Ip, Port);
-			client.Received += packet =>
-			{
-				_logger?.Log($"Received packet: {packet.Data}");
-			};
-
-			var thread = new Thread(() =>
-			{
-				client.Start(_cts.Token);
-			});
-
-			thread.Start();
 		}
 
 		/// <summary>
@@ -165,13 +150,17 @@ namespace rbcl.network
 		{
 			try
 			{
-				while (!_cts.IsCancellationRequested)
-				{
+				//while (!_cts.IsCancellationRequested)
+				//{
 					var client = _listener.AcceptTcpClient();
+					var ack = "Connected to server Io!"u8.ToArray();
+					client.GetStream().Write(ack);
+
 					_connections.TryAdd(client.GetHashCode(), client);
 					_logger?.Log(Message.BuildNewClientConnect(client.GetHashCode()));
 					Connected?.Invoke(client);
-				}
+					Accept();
+				//}
 			}
 			catch (SocketException e) { _logger?.LogException(e); }
 		}

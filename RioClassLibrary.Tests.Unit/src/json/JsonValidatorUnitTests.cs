@@ -146,7 +146,7 @@ namespace rbcl.tests.unit {
 
 		/// <summary>
 		/// This bastardized piece of code attempts to pin memory on the stack for a byte pointer
-		/// that is created from a 'Span' that is stack allocated wrt 'json.Length'
+		/// that is created from a 'NaiveSpan' that is stack allocated wrt 'json.Length'
 		/// </summary>
 		[Theory]
 		[InlineData("{\"Id\":1,\"Name\": 'Test\",\"Payload\":\"12, 323, 232\"}")]
@@ -164,7 +164,7 @@ namespace rbcl.tests.unit {
 				//https://stackoverflow.com/questions/59605908/what-is-a-working-alternative-to-being-unable-to-pass-a-spant-into-lambda-expr
 				var jsonLocal = json;
 				//var action = () => {
-				//	var spanToPass = new System.Span<byte>(veryBadPtrToCreate, jsonLocal.Length);
+				//	var spanToPass = new System.NaiveSpan<byte>(veryBadPtrToCreate, jsonLocal.Length);
 				//	return s1.ValidateStrategy(spanToPass);
 				//};
 

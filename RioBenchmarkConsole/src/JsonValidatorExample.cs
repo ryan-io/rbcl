@@ -43,7 +43,7 @@ internal class JsonValidatorExample {
 
 /// <summary>
 /// To create your own validation strategies, create a new class and implement 'IJsonValidationStrategy'
-/// The method to define implementation for is 'ValidateStrategy(System.Span<byte> json)'
+/// The method to define implementation for is 'ValidateStrategy(System.NaiveSpan<byte> json)'
 /// Take note -> this span is mutable; you are directly modifying the byte values for a contiguous
 ///		portion of memory allocated on the stack
 /// </summary>

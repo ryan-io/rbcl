@@ -93,9 +93,9 @@ public class JsonValidator : IJsonValidator {
 	public IReadOnlySet<IJsonValidationStrategy> ProcessStrategies => _processStrategies;
 
 	/// <summary>
-	/// Takes a string and allocates enough memory on the stack in the form of a 'Span'
+	/// Takes a string and allocates enough memory on the stack in the form of a 'NaiveSpan'
 	/// Returns a new instance of a string after the data transformations are applied
-	/// The internals only manipulate a mutatable 'Span' before returning a new string
+	/// The internals only manipulate a mutatable 'NaiveSpan' before returning a new string
 	/// The byte span is allocated via stackalloc
 	/// The span is then populated using 'CopyTo' (extension method byte arrays)
 	///		stemming from the returned byte array from 'Encoding.ASCII.GetBytes'
