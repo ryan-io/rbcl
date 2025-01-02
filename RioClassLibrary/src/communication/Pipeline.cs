@@ -8,7 +8,7 @@ namespace rbcl.communication;
 /// Represents the arguments passed to a command pipeline.
 /// This is an abstract class and should be inherited by a concrete implementation.
 /// </summary>
-public abstract class PipelinePayload<T> : IPayload<T>
+public class PipelinePayload<T> : IPayload<T>
 {
 	/// <inheritdoc/>
 	public T Payload { get; }
@@ -31,12 +31,12 @@ public abstract class PipelinePayload<T> : IPayload<T>
 	/// <value>
 	/// The current state of the command pipeline.
 	/// </value>
-	public PipelineState CurrentState { get; internal set; } = PipelineState.None;
+	public PipelineState CurrentState { get; internal set; } = PipelineState.Idle;
 
 	/// <summary>
 	/// Protected constructor used to initialize the payload
 	/// </summary>
-	protected PipelinePayload (T payload) { Payload = payload; }
+	public PipelinePayload (T payload) { Payload = payload; }
 
 	/// <summary>
 	/// Wrapper class for an empty pipeline object
@@ -49,17 +49,21 @@ public abstract class PipelinePayload<T> : IPayload<T>
 
 #endregion
 
+#region Pipeline Error
+
 /// <summary>
 /// Base class for a pipeline error
 /// </summary>
 public abstract class PipelineError : Exception { }
+
+#endregion
 
 #region Pipeline
 
 /// <summary>
 /// Represents a command pipeline that executes a series of asynchronous pipeline delegates.
 /// </summary>
-public abstract class Pipeline<T> : IPipeline<T>
+public class Pipeline<T> : IPipeline<T>
 {
 	#region Public Events
 
@@ -98,7 +102,7 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <param name="payload">The command pipeline arguments.</param>
 	/// <param name="token">Optional cancellation token to cancel the pipeline execution.</param>
 	/// <returns>A task representing the asynchronous pipeline execution.</returns>
-	public delegate Task PipelineWorkTaskDelegate (object? sender, PipelinePayload<T> payload, CancellationToken? token = default);
+	public delegate Task PipelineWorkTaskDelegate (object? sender, IPayload<T> payload, CancellationToken? token = default);
 
 	/// <summary>
 	/// Represents a delegate when the pipeline throws an exception
@@ -108,14 +112,14 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <param name="error">The exception that was thrown.</param>
 	/// <param name="token">Optional cancellation token to cancel the pipeline execution.</param>
 	/// <returns>A task representing the asynchronous pipeline execution.</returns>
-	public delegate Task PipelineErrorTaskDelegate (object? sender, PipelinePayload<T> payload, PipelineError error, CancellationToken? token = default);
+	public delegate Task PipelineErrorTaskDelegate (object? sender, IPayload<T> payload, PipelineError error, CancellationToken? token = default);
 
 	/// <summary>
 	/// Represents a synchronous delegate for various state changes within the command pipeline.
 	/// </summary>
 	/// <param name="sender">The original sender throughout the call stack</param>
 	/// <param name="payload">The command pipeline arguments.</param>
-	public delegate void PipelineDelegate (object? sender, PipelinePayload<T> payload);
+	public delegate void PipelineDelegate (object? sender, IPayload<T> payload);
 
 	/// <summary>
 	/// Represents a synchronous delegate for various state changes within the command pipeline.
@@ -123,19 +127,20 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <param name="sender">The original sender throughout the call stack</param>
 	/// <param name="payload">The command pipeline arguments.</param>
 	/// <param name="error">Error that was caught.</param>
-	public delegate void PipelineErrorDelegate (object? sender, PipelinePayload<T> payload, PipelineError error);
+	public delegate void PipelineErrorDelegate (object? sender, IPayload<T> payload, PipelineError error);
 
 	#endregion
 
 	#region Public Properties
 
-	public PipelineState State { get; private set; } = PipelineState.None;
+	public PipelineState State { get; private set; } = PipelineState.Idle;
 
 	#endregion
 
 	#region Public Methods
 
-	public async Task SignalAsync (PipelinePayload<T> payload, TimeSpan timeout = default, CancellationToken? token = default)
+	/// <inheritdoc/>
+	public async Task SignalAsync (IPayload<T> payload, TimeSpan timeout = default, CancellationToken? token = default)
 	{
 		if (State is PipelineState.None or not PipelineState.Idle)
 		{
@@ -197,6 +202,18 @@ public abstract class Pipeline<T> : IPipeline<T>
 			// logic for if the mutex is locked 
 			// this implies that the pipeline is currently running
 		}
+	}
+
+	/// <inheritdoc/>
+	public bool StopSignal ()
+	{
+		if (_cts.IsCancellationRequested)
+		{
+			return false;
+		}
+
+		_cts.Cancel();
+		return true;
 	}
 
 	#region Work Registration
@@ -275,7 +292,7 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <summary>
 	/// Beings pipeline start operations
 	/// </summary>
-	async Task OnStart (PipelinePayload<T> payload, CancellationToken? token)
+	async Task OnStart (IPayload<T> payload, CancellationToken? token)
 	{
 		if (_startItems.Count > 0)
 		{
@@ -286,7 +303,7 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <summary>
 	/// Beings pipeline work operations
 	/// </summary>
-	async Task OnWork (PipelinePayload<T> payload, CancellationToken? token)
+	async Task OnWork (IPayload<T> payload, CancellationToken? token)
 	{
 		if (_workItems.Count > 0)
 		{
@@ -297,7 +314,7 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <summary>
 	/// Beings pipeline end operations
 	/// </summary>
-	async Task OnEnd (PipelinePayload<T> payload, CancellationToken? token)
+	async Task OnEnd (IPayload<T> payload, CancellationToken? token)
 	{
 		if (_endItems.Count > 0)
 		{
@@ -308,7 +325,7 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <summary>
 	/// Beings pipeline error operations
 	/// </summary>
-	async Task OnError (PipelinePayload<T> payload, PipelineError error, CancellationToken? token)
+	async Task OnError (IPayload<T> payload, PipelineError error, CancellationToken? token)
 	{
 		if (_errorItems.Count > 0)
 		{
@@ -322,7 +339,7 @@ public abstract class Pipeline<T> : IPipeline<T>
 	/// <param name="col">The concurrent collection to work with</param>
 	/// <param name="payload">The pipeline payload</param>
 	/// <param name="token">Optional cancellation token</param>
-	async Task OptimizeWork (ConcurrentDictionary<int, PipelineWorkTaskDelegate> col, PipelinePayload<T> payload, CancellationToken? token)
+	async Task OptimizeWork (ConcurrentDictionary<int, PipelineWorkTaskDelegate> col, IPayload<T> payload, CancellationToken? token)
 	{
 		if (col.Count > PerfToggle)
 		{
@@ -343,13 +360,13 @@ public abstract class Pipeline<T> : IPipeline<T>
 	}
 
 	/// <summary>
-	/// Optimizes the work by using parallelism when the number of work items exceeds a certain threshold.
+	/// Optimizes the error work by using parallelism when the number of work items exceeds a certain threshold.
 	/// </summary>
 	/// <param name="col">The concurrent collection to work with</param>
 	/// <param name="payload">The pipeline payload</param>
-	/// <param name="error"></param>
+	/// <param name="error">Pipeline error that occurred</param>
 	/// <param name="token">Optional cancellation token</param>
-	async Task OptimizeError (ConcurrentDictionary<int, PipelineErrorTaskDelegate> col, PipelinePayload<T> payload, PipelineError error, CancellationToken? token)
+	async Task OptimizeError (ConcurrentDictionary<int, PipelineErrorTaskDelegate> col, IPayload<T> payload, PipelineError error, CancellationToken? token)
 	{
 		if (col.Count > PerfToggle)
 		{
@@ -437,7 +454,13 @@ public interface IPipelineSignal<T>
 	/// <param name="timeout">Time in milliseconds before the try-start method returns. Default is to asynchronously wait (timeout = -1)</param>
 	/// <param name="token">A <see cref="CancellationToken"/> to cancel the operation. If not specified, <see cref="CancellationToken.None"/> is used.</param>
 	/// <returns>A <see cref="Task"/> representing a unit of work</returns>
-	Task SignalAsync (PipelinePayload<T> payload, TimeSpan timeout = default, CancellationToken? token = default);
+	Task SignalAsync (IPayload<T> payload, TimeSpan timeout = default, CancellationToken? token = default);
+
+	/// <summary>
+	/// Attempts to stop the pipeline
+	/// </summary>
+	/// <returns>True if successfully stopped, otherwise false</returns>
+	bool StopSignal ();
 }
 
 /// <summary>

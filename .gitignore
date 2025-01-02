@@ -439,3 +439,5 @@ Desktop.ini
 other-workflows/
 /.github/bak.workflow/
 notes.md
+
+RioBenchmarkConsole/Program.cs
