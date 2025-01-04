@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="src\common\" />
+    <Folder Include="src\communication\" />
   </ItemGroup>
 
   <ItemGroup>
