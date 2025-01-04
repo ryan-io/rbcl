@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RioClassLibrary.IoT", "RioC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RioClassLibrary.IoT.Tests.Unit", "RioClassLibrary.IoT.Tests.Unit\RioClassLibrary.IoT.Tests.Unit.csproj", "{CF91BAC8-4797-4A82-9C35-B8C97DAF70AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RioClassLibrary.Rx", "RioClassLibrary.Rx\RioClassLibrary.Rx.csproj", "{34B103C9-82C6-414D-8683-BB7F01D6E78E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RioClassLibrary.Rx", "RioClassLibrary.Rx\RioClassLibrary.Rx.csproj", "{34B103C9-82C6-414D-8683-BB7F01D6E78E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RioBenchmark.WPF", "RioBenchmark.WPF\RioBenchmark.WPF.csproj", "{74389899-AA30-4689-A1BB-5BB04713817D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{34B103C9-82C6-414D-8683-BB7F01D6E78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34B103C9-82C6-414D-8683-BB7F01D6E78E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34B103C9-82C6-414D-8683-BB7F01D6E78E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74389899-AA30-4689-A1BB-5BB04713817D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74389899-AA30-4689-A1BB-5BB04713817D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74389899-AA30-4689-A1BB-5BB04713817D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74389899-AA30-4689-A1BB-5BB04713817D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
